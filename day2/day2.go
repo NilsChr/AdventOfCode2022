@@ -1,18 +1,32 @@
 package day2
 
 import (
-	"fmt"
 	"advent-of-code-2022/utils"
+	"fmt"
+)
+
+const (
+	ROCK       int = 1
+	PAPER          = 2
+	SCISSOR        = 3
+	LOOSE          = 1
+	DRAW           = 2
+	WIN            = 3
+	DRAW_SCORE     = 3
+	WIN_SCORE      = 6
 )
 
 func Day2() {
 	lines := utils.GetInput("./day2/input.txt")
 	task1 := runGame(lines, 1)
 	fmt.Println("Task 1 score: ", task1)
+
+	task2 := runGame(lines, 2)
+	fmt.Println("Task 1 score: ", task2)
 }
 
 func runGame(lines []string, strat int) int {
-	var score int = 0;
+	var score int = 0
 	for _, line := range lines {
 		if strat == 1 {
 			score += calculateScore1(line)
@@ -25,91 +39,72 @@ func runGame(lines []string, strat int) int {
 }
 
 func calculateScore1(line string) int {
-	var otherScore = getValue(line[0])
-	var myScore = getValue(line[2])
+	var handA = getValue(line[0])
+	var handB = getValue(line[2])
 
-	// 1 rock, 2 paper, 3 scissor
-	if myScore == otherScore {
-		return 3 + myScore
+	if handB == handA {
+		return DRAW_SCORE + handB
 	}
-	if myScore == 1 && otherScore == 3 {
-		return 6 + myScore
+	if handB == ROCK && handA == SCISSOR {
+		return WIN_SCORE + handB
 	}
-	if myScore == 2 && otherScore == 1 {
-		return 6 + myScore
+	if handB == PAPER && handA == ROCK {
+		return WIN_SCORE + handB
 	}
-	if myScore == 3 && otherScore == 2 {
-		return 6 + myScore
+	if handB == SCISSOR && handA == PAPER {
+		return WIN_SCORE + handB
 	}
 
-	return myScore
+	return handB
 }
 
 func calculateScore2(line string) int {
-	var otherScore = getValue(line[0])
-	var myScore = getValue(line[2])
+	var hand = getValue(line[0])
+	var condition = getValue(line[2])
 
-	// 1 rock, 2 paper, 3 scissor
-	// 1 loose, 2 draw, 3 win
-	if myScore == 1 {
-		return getLoose(byte(otherScore))
+	if condition == LOOSE {
+		return getScore(hand, condition)
 	}
-	if myScore == 2 {
-		return 3 + getDraw(byte(otherScore))
+	if condition == DRAW {
+		return DRAW_SCORE + getScore(hand, condition)
 	}
-	if myScore == 3 {
-		return + getWin(byte(otherScore))
+	if condition == WIN {
+		return WIN_SCORE + getScore(hand, condition)
 	}
 
-	return myScore
+	return -1
 }
 
 func getValue(char byte) int {
 	if char == 'A' || char == 'X' {
-		return 1;
+		return 1
 	}
 	if char == 'B' || char == 'Y' {
-		return 2;
+		return 2
 	}
 	if char == 'C' || char == 'Z' {
-		return 3;
+		return 3
 	}
 	return 0
 }
 
-func getWin(char byte) int {
-	if char == 'A' {
-		return 2;
+func getScore(score int, condition int) int {
+	var out int = score
+	if condition == DRAW {
+		return out
 	}
-	if char == 'B' {
-		return 3;
+	if condition == LOOSE {
+		out -= 1
 	}
-	if char == 'C' {
-		return 1;
+	if condition == WIN {
+		out += 1
 	}
-	return 0
-}
-func getLoose(char byte) int {
-	if char == 'A' {
-		return 3;
+
+	if out > 3 {
+		out = out % 3
 	}
-	if char == 'B' {
-		return 1;
+	if out < 1 {
+		out = 3
 	}
-	if char == 'C' {
-		return 2;
-	}
-	return 0
-}
-func getDraw(char byte) int {
-	if char == 'A' {
-		return 1;
-	}
-	if char == 'B' {
-		return 2;
-	}
-	if char == 'C' {
-		return 3;
-	}
-	return 0
+	return out
 }

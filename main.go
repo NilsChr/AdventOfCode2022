@@ -1,10 +1,10 @@
 package main
 
 import (
-	"os"
-	"fmt"
 	"advent-of-code-2022/day1"
 	"advent-of-code-2022/day2"
+	"fmt"
+	"os"
 )
 
 func main() {
@@ -17,10 +17,10 @@ func main() {
 	fmt.Println("advent ", day)
 	switch day {
 	case "1":
-		fmt.Println("Running day1");
+		fmt.Println("Running day1")
 		day1.Day1()
 	case "2":
-		fmt.Println("Running day2"); 
+		fmt.Println("Running day2")
 		day2.Day2()
 	}
 }
