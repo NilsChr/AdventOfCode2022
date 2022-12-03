@@ -9,16 +9,15 @@ import (
 func Day3() {
 	fmt.Println("Day 3")
 	lines := utils.GetInput("./day3/input.txt")
-	sum1 := task1(lines)
-	fmt.Println("Task1: ", sum1)
-	sum2 := task2(lines)
-	fmt.Println("Task2: ", sum2)
+	fmt.Println("Task1: ", task1(lines))
+	fmt.Println("Task2: ", task2(lines))
 }
 
 func task1(lines []string) int {
 	sum := 0
 	for _, line := range lines {
-		sum += getPriority(getCommon([]string{line[:len(line)/2], line[len(line)/2:]}))
+		half := len(line)/2
+		sum += getPriority(getCommon([]string{line[:half], line[half:]}))
 	}
 	return sum
 }
