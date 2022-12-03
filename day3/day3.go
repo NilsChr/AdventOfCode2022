@@ -18,7 +18,7 @@ func Day3() {
 func task1(lines []string) int {
 	sum := 0
 	for _, line := range lines {
-		sum += getPriority(getCommon(getParts(line)))
+		sum += getPriority(getCommon([]string{line[:len(line)/2], line[len(line)/2:]}))
 	}
 	return sum
 }
@@ -49,10 +49,4 @@ func getCommon(parts []string) string {
 		}
 	}
 	return ""
-}
-
-func getParts(line string) []string {
-	part1 := line[:len(line)/2]
-	part2 := line[len(line)/2:]
-	return []string{part1, part2}
 }
