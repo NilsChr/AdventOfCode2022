@@ -54,14 +54,7 @@ func task1(lines []string) string {
 			}
 		}
 	}
-	out := ""
-	for _, stack := range stacks {
-		data, exists := stack.Peak()
-		if exists {
-			out += data
-		}
-	}
-	return out
+	return getPuzzleAnswer(&stacks)
 }
 
 func task2(lines []string) string {
@@ -79,8 +72,12 @@ func task2(lines []string) string {
 			stacks[to].Push(string(packages[i]))
 		} 
 	}
+	return getPuzzleAnswer(&stacks)
+}
+
+func getPuzzleAnswer(stacks *[9]Stack) string {
 	out := ""
-	for _, stack := range stacks {
+	for _, stack := range *stacks {
 		data, exists := stack.Peak()
 		if exists {
 			out += data
