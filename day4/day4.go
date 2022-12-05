@@ -7,7 +7,6 @@ import (
 	"strconv"
 )
 
-
 func Day4() {
 	fmt.Println("Day 4")
 	lines := utils.GetInput("./day4/input.txt")
