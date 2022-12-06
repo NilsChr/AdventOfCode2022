@@ -6,6 +6,7 @@ import (
 	"advent-of-code-2022/day3"
 	"advent-of-code-2022/day4"
 	"advent-of-code-2022/day5"
+	"advent-of-code-2022/day6"
 	"fmt"
 	"os"
 )
@@ -34,5 +35,8 @@ func main() {
 	case "5":
 		fmt.Println("Running day5")
 		day5.Day5()
+	case "6":
+		fmt.Println("Running day6")
+		day6.Day6()
 	}
 }
