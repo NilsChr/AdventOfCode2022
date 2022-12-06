@@ -9,7 +9,6 @@ func Day6() {
 	lines := utils.GetInput("./day6/input.txt")
 	fmt.Println("Task1: ", findMarker(lines[0], 4))
 	fmt.Println("Task2: ", findMarker(lines[0], 14))
-
 }
 
 func findMarker(line string, size int) int {
