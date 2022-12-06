@@ -1,12 +1,12 @@
 package day6
 
 import (
-	"advent-of-code-2022/utils"
+	u "advent-of-code-2022/utils"
 	"fmt"
 )
 
 func Day6() {
-	lines := utils.GetInput("./day6/input.txt")
+	lines := u.GetInput("./day6/input.txt")
 	fmt.Println("Task1: ", findMarker(lines[0], 4))
 	fmt.Println("Task2: ", findMarker(lines[0], 14))
 }
@@ -18,7 +18,7 @@ func findMarker(line string, size int) int {
 			m[string(line[i-j])] = true
 		}
 		if len(m) == size {
-			return i+1;
+			return i + 1
 		}
 	}
 	return -1
