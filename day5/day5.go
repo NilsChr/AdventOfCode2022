@@ -3,38 +3,9 @@ package day5
 import (
 	"advent-of-code-2022/utils"
 	"fmt"
-	"strings"
 	"strconv"
+	"strings"
 )
-
-type Stack []string
-
-func (s *Stack) IsEmpty() bool {
-	return len(*s) == 0
-}
-
-func (s *Stack) Push(str string) {
-	*s = append(*s, str)
-}
-
-func (s *Stack) Pop()(string, bool) {
-	if s.IsEmpty() {
-		return "", false
-	} else {
-		index := len(*s) - 1
-		element := (*s)[index]
-		*s = (*s)[:index]
-		return element, true
-	}
-}
-
-func (s *Stack) Peak() (string, bool) {
-	if s.IsEmpty() {
-		return "", false
-	} else {
-		return (*s)[len(*s) - 1], true
-	}
-}
 
 func Day5() {
 	fmt.Println("Day 5")
@@ -44,8 +15,10 @@ func Day5() {
 }
 
 func task1(lines []string) string {
-	stacks := initStacks()
-	for _, line := range lines {
+	stacks, lastindex := initStacks(lines)
+	instructions := lines[lastindex+2:]
+
+	for _, line := range instructions {
 		amount, from, to := parseInstructions(line)
 		for i := 0; i < amount; i++ {
 			data, found := stacks[from].Pop()
@@ -54,12 +27,15 @@ func task1(lines []string) string {
 			}
 		}
 	}
+
 	return getPuzzleAnswer(&stacks)
 }
 
 func task2(lines []string) string {
-	stacks := initStacks()
-	for _, line := range lines {
+	stacks, lastindex := initStacks(lines)
+	instructions := lines[lastindex+2:]
+
+	for _, line := range instructions {
 		amount, from, to := parseInstructions(line)
 		packages := ""
 		for i := 0; i < amount; i++ {
@@ -70,12 +46,12 @@ func task2(lines []string) string {
 		}
 		for i := len(packages) - 1; i >= 0; i-- {
 			stacks[to].Push(string(packages[i]))
-		} 
+		}
 	}
 	return getPuzzleAnswer(&stacks)
 }
 
-func getPuzzleAnswer(stacks *[9]Stack) string {
+func getPuzzleAnswer(stacks *[9]utils.Stack[string]) string {
 	out := ""
 	for _, stack := range *stacks {
 		data, exists := stack.Peak()
@@ -88,28 +64,33 @@ func getPuzzleAnswer(stacks *[9]Stack) string {
 
 func parseInstructions(line string) (int, int, int) {
 	parts := strings.Split(line, " ")
-	amount,_ := strconv.Atoi(parts[1])
-	from,_ := strconv.Atoi(parts[3])
-	to,_ := strconv.Atoi(parts[5])
-	return amount, from-1, to-1
+	amount, _ := strconv.Atoi(parts[1])
+	from, _ := strconv.Atoi(parts[3])
+	to, _ := strconv.Atoi(parts[5])
+	return amount, from - 1, to - 1
 }
 
-func initStacks() [9]Stack {
-	var stacks [9]Stack
-	initStack(&stacks[0], "FDBZTJRN")
-	initStack(&stacks[1], "RSNJH")
-	initStack(&stacks[2], "CRNJGZFQ")
-	initStack(&stacks[3], "FVNGRTQ")
-	initStack(&stacks[4], "LTQF")
-	initStack(&stacks[5], "QCWZBRGN")
-	initStack(&stacks[6], "FCLSNHM")
-	initStack(&stacks[7], "DNQMTJ")
-	initStack(&stacks[8], "PGS")
-	return stacks
-}
+func initStacks(lines []string) ([9]utils.Stack[string], int) {
+	var cols [9]string
+	var stacks [9]utils.Stack[string]
+	lastline := 0
 
-func initStack(stack *Stack, input string) {
-	for _, i := range input {
-		stack.Push(string(i))
+	for i, line := range lines {
+		if line[1] == '1' {
+			lastline = i
+			break
+		}
 	}
+
+	for i := lastline; i >= 0; i-- {
+		line := lines[i]
+		x := 1
+		for i := 0; i < len(cols); i++ {
+			if line[x] != ' ' {
+				stacks[i].Push(string(line[x]))
+			}
+			x += 4
+		}
+	}
+	return stacks, lastline
 }
