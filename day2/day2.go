@@ -45,6 +45,7 @@ func calculateScore1(line string) int {
 	if handB == handA {
 		return DRAW_SCORE + handB
 	}
+
 	if handB == ROCK && handA == SCISSOR {
 		return WIN_SCORE + handB
 	}
