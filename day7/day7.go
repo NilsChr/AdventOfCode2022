@@ -3,89 +3,92 @@ package day7
 import (
 	u "advent-of-code-2022/utils"
 	"fmt"
+	"sort"
 	"strconv"
 	"strings"
 )
 
-const (
-	CD int = 0
-	LS
-	MK
-)
-
-// TOO HIGH = 1102256
-
 func Day7() {
-	lines := u.GetInput2("./day7/input.txt")
-	fmt.Println("Task1: ", task1(lines))
-	//fmt.Println("Task2: ", lines)
+	lines := u.GetInput("./day7/input.txt")
+	task1, task2 := tasks(lines)
+	fmt.Println("Task1: ", task1)
+	fmt.Println("Task2: ", task2)
 }
 
-func task1(lines []string) int {
+func tasks(lines []string) (int,int) {
+	root, folders := buildTree(lines)
+	calcSize(root)
+	diskspace := 70_000_000
+	required  := 30_000_000
+	unused  := diskspace - root.size;
+	var possible_delete []int
+	task1 := 0
+	task2 := 0
 
-	root, dirs := buildTree(lines)
-	fmt.Println(root)
+	for _, folder := range folders {
+		if folder.size <= 100_000 {
+			task1 += folder.size
+		}
 
-	sum := 0
-	for i := len(dirs) - 1; i >= 0; i-- {
-		fmt.Println(dirs[i].name, dirs[i].size)
-		if dirs[i].size <= 100000 {
-			sum += dirs[i].size
+		if unused + folder.size > required  {
+			possible_delete = append(possible_delete, folder.size)
 		}
 	}
 
-	return sum
+	sort.Slice(possible_delete, func(i, j int) bool {
+		return possible_delete[i] < possible_delete[j]
+	})
+
+	task2 = possible_delete[0]
+
+	return task1,task2
+}
+
+func calcSize(node *Node) int {
+	if len(node.children) == 0 {
+		return node.size
+	}
+	for _, child := range node.children {
+		node.size += calcSize(child)
+	}
+	return node.size
 }
 
 func buildTree(lines []string) (*Node, []*Node) {
 	root := new(Node)
 	root.name = "root"
-
 	current := root
-	var dirs []*Node
-	var files []*Node
+	var folders []*Node
 	for _, line := range lines {
 		isCommand, values := parseLine(line)
 		if isCommand {
 			if values[0] == "cd" {
-				if values[1] == `/` {
-					//	fmt.Println("cd root")
+				if values[1] == "/" {
 					current = root
 				} else if values[1] == ".." {
-					//	fmt.Println("cd ", values[1])
 					current = current.parent
 				} else {
-					//	fmt.Println("cd ", values[1])
 					current = getChild(*current, values[1])
 				}
-			} else {
-				//fmt.Println("ls ")
 			}
 		} else {
 			if values[0] == "dir" {
-				//fmt.Println("Create folder,", values[1])
 				child := new(Node)
 				child.parent = current
 				child.name = values[1]
-				dirs = append(dirs, child)
 				current.addChild(child)
+				folders = append(folders, child)
 			} else {
 				child := new(Node)
 				child.parent = current
 				child.size, _ = strconv.Atoi(values[0])
 				child.name = values[1]
-				files = append(files, child)
-				//fmt.Println("Create file,", values[1])
 				current.children = append(current.children, child)
 			}
 		}
 	}
 
-	for i := len(files) - 1; i >= 0; i-- {
-		files[i].passSizeToParent()
-	}
-
-	return root, dirs
+	return root, folders
 }
 
 func parseLine(line string) (bool, []string) {
@@ -97,13 +100,11 @@ func parseLine(line string) (bool, []string) {
 }
 
 func getChild(node Node, search string) *Node {
-	//fmt.Println("GET CHILD", search)
 	var out *Node
 	for _, child := range node.children {
 		if child.name == search {
 			out = child
 		}
 	}
-	// fmt.Println("Return child, ", out)
 	return out
 }

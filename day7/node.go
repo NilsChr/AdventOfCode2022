@@ -5,10 +5,7 @@ type Node struct {
 	children []*Node
 	name     string
 	size     int
-}
-
-func (n *Node) isFolder() bool {
-	return len(n.children) == 0
+	//folder   bool
 }
 
 func (n *Node) addChild(node *Node) {
