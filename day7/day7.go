@@ -8,6 +8,13 @@ import (
 	"strings"
 )
 
+type Node struct {
+	parent   *Node
+	children []*Node
+	name     string
+	size     int
+}
+
 func Day7() {
 	lines := u.GetInput("./day7/input.txt")
 	task1, task2 := tasks(lines)
@@ -37,16 +44,6 @@ func tasks(lines []string) (int, int) {
 	})
 
 	return task1, possible_delete[0]
-}
-
-func calcSize(node *Node) int {
-	if len(node.children) == 0 {
-		return node.size
-	}
-	for _, child := range node.children {
-		node.size += calcSize(child)
-	}
-	return node.size
 }
 
 func buildTree(lines []string) (*Node, []*Node) {
@@ -90,4 +87,14 @@ func getChild(node Node, search string) *Node {
 		}
 	}
 	return out
+}
+
+func calcSize(node *Node) int {
+	if len(node.children) == 0 {
+		return node.size
+	}
+	for _, child := range node.children {
+		node.size += calcSize(child)
+	}
+	return node.size
 }
