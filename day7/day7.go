@@ -15,22 +15,19 @@ func Day7() {
 	fmt.Println("Task2: ", task2)
 }
 
-func tasks(lines []string) (int,int) {
+func tasks(lines []string) (int, int) {
 	root, folders := buildTree(lines)
 	calcSize(root)
-	diskspace := 70_000_000
-	required  := 30_000_000
-	unused  := diskspace - root.size;
+	unused := 70_000_000 - root.size
 	var possible_delete []int
 	task1 := 0
-	task2 := 0
 
 	for _, folder := range folders {
 		if folder.size <= 100_000 {
 			task1 += folder.size
 		}
 
-		if unused + folder.size > required  {
+		if unused+folder.size > 30_000_000 {
 			possible_delete = append(possible_delete, folder.size)
 		}
 	}
@@ -39,9 +36,7 @@ func tasks(lines []string) (int,int) {
 		return possible_delete[i] < possible_delete[j]
 	})
 
-	task2 = possible_delete[0]
-
-	return task1,task2
+	return task1, possible_delete[0]
 }
 
 func calcSize(node *Node) int {
@@ -60,43 +55,31 @@ func buildTree(lines []string) (*Node, []*Node) {
 	current := root
 	var folders []*Node
 	for _, line := range lines {
-		isCommand, values := parseLine(line)
-		if isCommand {
-			if values[0] == "cd" {
-				if values[1] == "/" {
+		parts := strings.Split(line, " ")
+		if parts[0] == "$" {
+			if parts[1] == "cd" {
+				if parts[2] == "/" {
 					current = root
-				} else if values[1] == ".." {
+				} else if parts[2] == ".." {
 					current = current.parent
 				} else {
-					current = getChild(*current, values[1])
+					current = getChild(*current, parts[2])
 				}
 			}
 		} else {
-			if values[0] == "dir" {
-				child := new(Node)
-				child.parent = current
-				child.name = values[1]
-				current.addChild(child)
+			child := new(Node)
+			child.parent = current
+			child.name = parts[1]
+			current.children = append(current.children, child)
+			if parts[0] == "dir" {
 				folders = append(folders, child)
 			} else {
-				child := new(Node)
-				child.parent = current
-				child.size, _ = strconv.Atoi(values[0])
-				child.name = values[1]
-				current.children = append(current.children, child)
+				child.size, _ = strconv.Atoi(parts[0])
 			}
 		}
 	}
 
 	return root, folders
-}
-
-func parseLine(line string) (bool, []string) {
-	parts := strings.Split(line, " ")
-	if parts[0] == "$" {
-		return true, parts[1:]
-	}
-	return false, parts
 }
 
 func getChild(node Node, search string) *Node {
