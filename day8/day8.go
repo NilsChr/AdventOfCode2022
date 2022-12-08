@@ -9,100 +9,59 @@ import (
 
 func Day8() {
 	lines := utils.GetInput("./day8/input.txt")
-	fmt.Println("Task 1: ", task1(lines))
-	fmt.Println("Task 2: ", task2(lines))
+	task1, task2 := tasks(lines)
+	fmt.Println("Task 1: ", task1)
+	fmt.Println("Task 2: ", task2)
 }
 
-func task1(lines []string) int {
+func tasks(lines []string) (int, int) {
 	grid := inputToArray(lines)
+	var scores []int
 	count := 0
 	for y := 0; y < len(grid); y++ {
 		for x := 0; x < len(grid[y]); x++ {
-			if !checkVisibility(grid, x, y) {
-				continue
+			task1, task2 := checkVisibility(grid, x, y)
+			scores = append(scores, task2)
+			if task1 {
+				count++
 			}
-			count++
 		}
-	}
-	return count
-}
 
-func task2(lines []string) int {
-	grid := inputToArray(lines)
-	var scores []int
-	for y := 0; y < len(grid); y++ {
-		for x := 0; x < len(grid[y]); x++ {
-			scores = append(scores, checkVisibility2(grid, x, y))
-		}
 	}
 	sort.Slice(scores, func(i, j int) bool {
 		return scores[i] > scores[j]
 	})
-	return scores[0]
+	return count, scores[0]
 }
 
-func checkVisibility(grid [][]int, x int, y int) bool {
-	a,_ := checkVisibilityLeft(grid, x, y)
-	b,_ := checkVisibilityRight(grid, x, y)
-	c,_ := checkVisibilityUp(grid, x, y)
-	d,_ := checkVisibilityDown(grid, x, y)
-	return (a + b + c + d) > 0
+func checkVisibility(grid [][]int, x int, y int) (bool, int) {
+	a, l0 := checkVisibilityDir(grid, x, y, -1, 0)
+	b, r0 := checkVisibilityDir(grid, x, y, 1, 0)
+	c, u0 := checkVisibilityDir(grid, x, y, 0, -1)
+	d, d0 := checkVisibilityDir(grid, x, y, 0, 1)
+	return (a + b + c + d) > 0, l0 * r0 * u0 * d0
 }
 
-func checkVisibility2(grid [][]int, x int, y int) int {
-	_,l := checkVisibilityLeft(grid, x, y)
-	_,r := checkVisibilityRight(grid, x, y)
-	_,u := checkVisibilityUp(grid, x, y)
-	_,d := checkVisibilityDown(grid, x, y)
-	return l * r * u * d
-}
-
-func checkVisibilityLeft(grid [][]int, x int, y int) (int,int) {
+func checkVisibilityDir(grid [][]int, x int, y int, dx int, dy int) (int, int) {
+	sx := x
+	sy := y
 	value := grid[y][x]
 	move := 0
-	for i := x - 1; i >= 0; i-- {
-		move++
-		if grid[y][i] >= value {
-			return 0,move
-		}
-	}
-	return 1,move
-}
 
-func checkVisibilityRight(grid [][]int, x int, y int) (int,int) {
-	value := grid[y][x]
-	move := 0
-	for i := x + 1; i <= len(grid[y])-1; i++ {
-		move++
-		if grid[y][i] >= value {
-			return 0,move
-		}
-	}
-	return 1,move
-}
+	for {
+		sx += dx
+		sy += dy
 
-func checkVisibilityUp(grid [][]int, x int, y int) (int,int) {
-	value := grid[y][x]
-	move := 0
-	for i := y - 1; i >= 0; i-- {
-		move++
-		if grid[i][x] >= value {
-			return 0,move
+		if (sx < 0 || sx > len(grid[0])-1) || (sy < 0 || sy > len(grid)-1) {
+			break
 		}
-	}
-	return 1,move
-}
+		move++
+		if grid[sy][sx] >= value {
+			return 0, move
+		}
 
-func checkVisibilityDown(grid [][]int, x int, y int) (int, int) {
-	value := grid[y][x]
-	move := 0
-	for i := y + 1; i <= len(grid)-1; i++ {
-		move++
-		if grid[i][x] >= value {
-			return 0,move
-		}
 	}
-	return 1,move
+	return 1, move
 }
 
 func inputToArray(lines []string) [][]int {
