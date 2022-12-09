@@ -17,115 +17,66 @@ type Instruction struct{
 	turns int
 }
 
-type Rope struct {
-	hx int
-	hy int
-	tx int
-	ty int
-	tails [][]int
-}
-
-func (r* Rope) runInstruction(instruction Instruction,positions map[string]bool) {
-	for i := 0; i < instruction.turns; i++ {
-		r.moveHead(instruction, positions)
-		//key := fmt.Sprintf("%d,%d", r.tx, r.ty)
-		// string(r.tx) + "," +string(r.ty)
-		positions[r.getTailKey()] = true
-	}
-}
-
-func (r* Rope) getTailKey() string {
-	x := r.tails[len(r.tails)-1][0]
-	y := r.tails[len(r.tails)-1][1]
-
-	return fmt.Sprintf("%d,%d", x, y)
-}
-
-func (r* Rope) moveHead(instruction Instruction, positions map[string]bool) {
-	r.hx += instruction.x
-	r.hy += instruction.y
-
-	/* WORKING
-	a := r.hx - r.tx
-	b := r.hy - r.ty
-	dist := math.Sqrt(float64(a*a+b*b))
-	if dist >= 2 {
-		if r.hx > r.tx {
-			r.tx++
-		} else if r.hx < r.tx {
-			r.tx--
-		}
-
-		if r.hy > r.ty {
-			r.ty++
-		} else if r.hy < r.ty {
-			r.ty--
-		}
-	}
-	*/
-	fx := r.hx
-	fy := r.hy
-	for i := 0; i < len(r.tails); i++ {
-		a := fx - r.tails[i][0]
-		b := fy - r.tails[i][1]
-		dist := math.Sqrt(float64(a*a+b*b))
-
-		if dist >= 2 {
-			if fx > r.tails[i][0] {
-				r.tails[i][0]++
-			} else if fx < r.tails[i][0] {
-				r.tails[i][0]--
-			}
-	
-			if fy > r.tails[i][1] {
-				r.tails[i][1]++
-			} else if fy < r.tails[i][1]{
-				r.tails[i][1]--
-			}
-		}
-
-		fx = r.tails[i][0]
-		fy = r.tails[i][1]
-	}
-
-	//debug(r, positions)
-	//fmt.Println(dist)
-}
-
-
-// Task 2: 2545 too low
 func Day9() {
 	lines := utils.GetInput("./day9/input.txt")
 	instructions := parseInstructions(lines) 
-	//fmt.Println("Task 1: ", task1(instructions))
-	fmt.Println("Task 2: ", task2(instructions))
-
+	fmt.Println("Task 1: ", task(instructions,2))
+	fmt.Println("Task 2: ", task(instructions,10))
 }
 
-func task1(instructions []Instruction) int {
-
-	rope := new(Rope)
-	rope.tails = append(rope.tails, []int{0,0})
+func task(instructions []Instruction, ropeSize int) int {
+	rope := createRope(ropeSize)
 	positions := make(map[string]bool)
 
 	for _,ins := range instructions {
-		rope.runInstruction(ins, positions)
+		for i := 0; i < ins.turns; i++ {
+			moveRope(rope, ins, positions)
+			tail := rope[len(rope)-1]
+			positions[fmt.Sprintf("%d,%d", tail[0], tail[1])] = true
+		}
 	}
+
 	return len(positions)
 }
 
-func task2(instructions []Instruction) int {
-
-	rope := new(Rope)
-	for i := 0; i < 9; i++ {
-		rope.tails = append(rope.tails, []int{0,0})
+func createRope(length int) [][]int {
+	var rope [][]int = [][]int{}
+	for i := 0; i < length; i++ {
+		rope = append(rope, []int{0,0})
 	}
-	positions := make(map[string]bool)
+	return rope
+}
 
-	for _,ins := range instructions {
-		rope.runInstruction(ins, positions)
+func moveRope(rope [][]int,instruction Instruction, positions map[string]bool) {
+	rope[0][0] += instruction.x
+	rope[0][1] += instruction.y
+
+	fx := rope[0][0]
+	fy := rope[0][1]
+	for i := 0; i < len(rope); i++ {
+		a := fx - rope[i][0]
+		b := fy - rope[i][1]
+		dist := math.Sqrt(float64(a*a+b*b))
+
+		if dist >= 2 {
+			if fx > rope[i][0] {
+				rope[i][0]++
+			} else if fx < rope[i][0] {
+				rope[i][0]--
+			}
+	
+			if fy > rope[i][1] {
+				rope[i][1]++
+			} else if fy < rope[i][1]{
+				rope[i][1]--
+			}
+		}
+
+		fx = rope[i][0]
+		fy = rope[i][1]
 	}
-	return len(positions)
+
+	//debug(rope, positions)
 }
 
 
@@ -157,7 +108,7 @@ func parseInstructions(lines []string) []Instruction {
 	return instructions
 }
 
-func debug(rope *Rope, positions map[string]bool) {
+func debug(rope [][]int, positions map[string]bool) {
 	cmd := exec.Command("clear") 
 	cmd.Stdout = os.Stdout
     cmd.Run()
@@ -167,11 +118,14 @@ func debug(rope *Rope, positions map[string]bool) {
 	for y := 0; y < 22; y++ {
 		for x := 0; x < 26; x++ {
 			key := fmt.Sprintf("%d,%d", x-ox,y-oy)
+			rx := rope[0][0]
+			ry := rope[0][1]
+
 			if positions[key] {
 				fmt.Print("#")
-			} else if rope.hx == x -ox && rope.hy == y-oy {
+			} else if rx == x -ox && ry == y-oy {
 				fmt.Print("H")
-			} else if rope.tx == x -ox && rope.ty == y-oy {
+			} else if rx == x -ox && ry == y-oy {
 				fmt.Print("T")
 			} else {
 				fmt.Print(".")
