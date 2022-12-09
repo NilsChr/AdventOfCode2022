@@ -1,5 +1,7 @@
 package utils
 
+import "fmt"
+
 func Contains(haystack []Node, needle Node) bool {
     for _, val := range haystack {
         if val.data == needle.data {
@@ -35,20 +37,40 @@ func (g *Graph) Add(parent *Node, data string ) *Node {
 	return node
 }
 
-func (g *Graph) DFS(target string) *Node {
-
+func (g *Graph) DFS(target string) (*Node, string) {
+	path := ""
 	var stack []Node
     stack = append(stack, *g.root)
 	for len(stack) > 0 {
         current := stack[len(stack)-1]
+		path += current.data
         stack = stack[:len(stack)-1]
 
         if current.data == target {
-            return &current
+            return &current, path
         }
         for _, child := range current.children {
             stack = append(stack, *child)
         }
     }
-    return nil
+    return nil,path
+}
+
+func (g *Graph) BFS(target string) (*Node, string) {
+	path := ""
+	var stack []Node
+    stack = append(stack, *g.root)
+	for len(stack) > 0 {
+        current := stack[0]
+		fmt.Print(current.data)
+        stack = stack[1:]
+
+        if current.data == target {
+            return &current, path
+        }
+        for _, child := range current.children {
+            stack = append(stack, *child)
+        }
+    }
+    return nil, path
 }

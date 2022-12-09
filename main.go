@@ -12,6 +12,7 @@ import (
 	"advent-of-code-2022/day9"
 	"fmt"
 	"os"
+	"time"
 )
 
 func main() {
@@ -20,8 +21,8 @@ func main() {
 		return
 	}
 	day := os.Args[1:][0]
-
-	fmt.Println("advent ", day)
+	start := time.Now()
+	
 	switch day {
 	case "1":
 		fmt.Println("Running day1")
@@ -51,4 +52,9 @@ func main() {
 		fmt.Println("Running day8")
 		day9.Day9()
 	}
+
+
+	elapsed := time.Since(start)
+	fmt.Printf("Time %f seconds\n", elapsed.Seconds())
+
 }
