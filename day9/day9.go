@@ -3,11 +3,8 @@ package day9
 import (
 	"advent-of-code-2022/utils"
 	"fmt"
-	"os"
-	"os/exec"
 	"strconv"
 	"strings"
-	"time"
 	"math"
 )
 
@@ -15,6 +12,11 @@ type Instruction struct{
 	x int
 	y int
 	turns int
+}
+
+type Vec2 struct {
+	x int 
+	y int
 }
 
 func Day9() {
@@ -26,59 +28,56 @@ func Day9() {
 
 func task(instructions []Instruction, ropeSize int) int {
 	rope := createRope(ropeSize)
-	positions := make(map[string]bool)
+	positions := make(map[Vec2]bool)
 
 	for _,ins := range instructions {
 		for i := 0; i < ins.turns; i++ {
-			moveRope(rope, ins, positions)
+			moveRope(rope, ins)
 			tail := rope[len(rope)-1]
-			positions[fmt.Sprintf("%d,%d", tail[0], tail[1])] = true
+			positions[tail] = true
 		}
 	}
 
 	return len(positions)
 }
 
-func createRope(length int) [][]int {
-	var rope [][]int = [][]int{}
+func createRope(length int) []Vec2 {
+	var rope []Vec2 = []Vec2{}
 	for i := 0; i < length; i++ {
-		rope = append(rope, []int{0,0})
+		rope = append(rope, *new(Vec2))
 	}
 	return rope
 }
 
-func moveRope(rope [][]int,instruction Instruction, positions map[string]bool) {
-	rope[0][0] += instruction.x
-	rope[0][1] += instruction.y
+func moveRope(rope []Vec2,instruction Instruction) {
+	rope[0].x += instruction.x
+	rope[0].y += instruction.y
 
-	fx := rope[0][0]
-	fy := rope[0][1]
+	fx := rope[0].x
+	fy := rope[0].y
 	for i := 0; i < len(rope); i++ {
-		a := fx - rope[i][0]
-		b := fy - rope[i][1]
+		a := fx - rope[i].x
+		b := fy - rope[i].y
 		dist := math.Sqrt(float64(a*a+b*b))
 
 		if dist >= 2 {
-			if fx > rope[i][0] {
-				rope[i][0]++
-			} else if fx < rope[i][0] {
-				rope[i][0]--
+			if fx > rope[i].x {
+				rope[i].x++
+			} else if fx < rope[i].x {
+				rope[i].x--
 			}
 	
-			if fy > rope[i][1] {
-				rope[i][1]++
-			} else if fy < rope[i][1]{
-				rope[i][1]--
+			if fy > rope[i].y {
+				rope[i].y++
+			} else if fy < rope[i].y{
+				rope[i].y--
 			}
 		}
 
-		fx = rope[i][0]
-		fy = rope[i][1]
+		fx = rope[i].x
+		fy = rope[i].y
 	}
-
-	//debug(rope, positions)
 }
-
 
 func parseInstructions(lines []string) []Instruction {
 	var instructions []Instruction 
@@ -106,33 +105,4 @@ func parseInstructions(lines []string) []Instruction {
 	}
 
 	return instructions
-}
-
-func debug(rope [][]int, positions map[string]bool) {
-	cmd := exec.Command("clear") 
-	cmd.Stdout = os.Stdout
-    cmd.Run()
-	fmt.Println(rope)
-	ox := 11
-	oy := 16
-	for y := 0; y < 22; y++ {
-		for x := 0; x < 26; x++ {
-			key := fmt.Sprintf("%d,%d", x-ox,y-oy)
-			rx := rope[0][0]
-			ry := rope[0][1]
-
-			if positions[key] {
-				fmt.Print("#")
-			} else if rx == x -ox && ry == y-oy {
-				fmt.Print("H")
-			} else if rx == x -ox && ry == y-oy {
-				fmt.Print("T")
-			} else {
-				fmt.Print(".")
-			}
-			
-		}
-		fmt.Println("")
-	}
-	time.Sleep(50 * time.Millisecond)
 }
