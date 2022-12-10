@@ -2,15 +2,6 @@ package utils
 
 import "fmt"
 
-func Contains(haystack []Node, needle Node) bool {
-    for _, val := range haystack {
-        if val.data == needle.data {
-            return true
-        }
-    }
-    return false
-}
-
 type Node struct {
 	parent   *Node
 	children []*Node
