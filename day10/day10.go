@@ -3,6 +3,7 @@ package day10
 import (
 	"advent-of-code-2022/utils"
 	"fmt"
+	"math/rand"
 	"strconv"
 	"strings"
 )
@@ -59,9 +60,9 @@ func (c* Cpu) increment() {
 func (c* Cpu) addToScreenBuffer() {
 	spritePos := c.regX
 	if c.pixelIndex < spritePos -1 || c.pixelIndex > spritePos +1 {
-		c.screenBuffer += " "
+		c.screenBuffer += "  "
 	} else {
-		c.screenBuffer += "█"
+		c.screenBuffer +=getRandom() //"🍆"// "█"
 	}
 	c.pixelIndex++
 	if(c.pixelIndex >= 40) {
@@ -69,6 +70,13 @@ func (c* Cpu) addToScreenBuffer() {
 		c.screenBuffer = ""
 		c.pixelIndex = 0
 	} 
+}
+
+func getRandom() string {
+	in := []string{"🍆", "💦"}
+    randomIndex := rand.Intn(len(in))
+    pick := in[randomIndex]
+	return pick
 }
 
 func (c* Cpu) render() {
