@@ -1,11 +1,17 @@
 package utils
 
-import "fmt"
+import (
+	"fmt"
+)
 
 type Node struct {
 	parent   *Node
 	children []*Node
 	data     string
+}
+
+func (n* Node) equals(other* Node) bool {
+    return n == other
 }
 
 type Graph struct {
@@ -31,9 +37,11 @@ func (g *Graph) Add(parent *Node, data string ) *Node {
 func (g *Graph) DFS(target string) (*Node, string) {
 	path := ""
 	var stack []Node
+    var visited []Node
     stack = append(stack, *g.root)
 	for len(stack) > 0 {
         current := stack[len(stack)-1]
+        visited = append(visited, current)
 		path += current.data
         stack = stack[:len(stack)-1]
 
@@ -41,8 +49,9 @@ func (g *Graph) DFS(target string) (*Node, string) {
             return &current, path
         }
         for _, child := range current.children {
-            stack = append(stack, *child)
-        }
+            if !ContainsGeneric(visited, child) {
+                stack = append(stack, *child)
+            }        }
     }
     return nil,path
 }
@@ -50,9 +59,11 @@ func (g *Graph) DFS(target string) (*Node, string) {
 func (g *Graph) BFS(target string) (*Node, string) {
 	path := ""
 	var stack []Node
+    var visited []Node
     stack = append(stack, *g.root)
 	for len(stack) > 0 {
         current := stack[0]
+        visited = append(visited, current)
 		fmt.Print(current.data)
         stack = stack[1:]
 
@@ -60,7 +71,9 @@ func (g *Graph) BFS(target string) (*Node, string) {
             return &current, path
         }
         for _, child := range current.children {
-            stack = append(stack, *child)
+            if !ContainsGeneric(visited, child) {
+                stack = append(stack, *child)
+            }
         }
     }
     return nil, path
