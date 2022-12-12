@@ -116,6 +116,20 @@ func searchGrid(grid [][]Node, start Node) *Node {
 			next := grid[n.y][n.x]
 			printGrid2(grid, current.getPos(), next.getPos(), visited2, queue)
 
+			if visited2[next.getPos()] {
+				fmt.Println("Allready added")
+				fmt.Scanln()
+			} else if current.value+1 <= next.value {
+				fmt.Println("Adding to queue:", next)
+				fmt.Scanln()
+				next.parent = &current
+				queue = append(queue, next)
+			} else {
+				fmt.Println("Nothing done");
+				fmt.Scanln();
+			}
+
+			/*
 			if !visited2[next.getPos()] && current.value+1 < next.value {
 				fmt.Println("Adding to queue:", next)
 				fmt.Scanln()
@@ -125,6 +139,7 @@ func searchGrid(grid [][]Node, start Node) *Node {
 				next.parent = &current
 				queue = append(queue, next)
 			}
+			*/
 
 		}
 
@@ -179,11 +194,12 @@ func printGrid(grid [][]Node) {
 }
 
 func printGrid2(grid [][]Node, focus Vec2, look Vec2, visited map[Vec2]bool, queue []Node) {
-	cmd := exec.Command("cmd", "/c", "cls")
+	//cmd := exec.Command("cmd", "/c", "cls")
+	cmd := exec.Command("clear")
 	cmd.Stdout = os.Stdout
 	cmd.Run()
-	fmt.Println("Focus:", focus)
-	fmt.Println("Looking at:", look)
+	fmt.Println("Focus:",     focus, grid[focus.y][focus.x].value, string(rune(grid[focus.y][focus.x].value)))
+	fmt.Println("Looking at:", look, grid[look.y][look.x].value  , string(rune(grid[look.y][look.x].value)))
 
 	fmt.Println("Visited", visited)
 	fmt.Println("Queue", queue)
@@ -191,9 +207,11 @@ func printGrid2(grid [][]Node, focus Vec2, look Vec2, visited map[Vec2]bool, que
 	for y := 0; y < len(grid); y++ {
 		for x := 0; x < len(grid[0])-1; x++ {
 			if focus.x == x && focus.y == y {
-				row += fmt.Sprint("\033[35m" + "*" + "\033[0m")
+				//row += fmt.Sprint("\033[35m" + "*" + "\033[0m")
+				row += fmt.Sprint("\033[35m" +  string(rune(grid[y][x].value)) + "\033[0m")
 			} else if look.x == x && look.y == y {
-				row += fmt.Sprint("\033[32m" + "¤" + "\033[0m")
+				//row += fmt.Sprint("\033[32m" + "¤" + "\033[0m")
+				row += fmt.Sprint("\033[32m" +  string(rune(grid[y][x].value)) + "\033[0m")
 			} else {
 				row += string(rune(grid[y][x].value))
 			}
