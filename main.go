@@ -4,6 +4,7 @@ import (
 	"advent-of-code-2022/day1"
 	"advent-of-code-2022/day10"
 	"advent-of-code-2022/day11"
+	"advent-of-code-2022/day12"
 	"advent-of-code-2022/day2"
 	"advent-of-code-2022/day3"
 	"advent-of-code-2022/day4"
@@ -24,7 +25,7 @@ func main() {
 	}
 	day := os.Args[1:][0]
 	start := time.Now()
-	
+
 	switch day {
 	case "1":
 		fmt.Println("Running day1")
@@ -59,8 +60,10 @@ func main() {
 	case "11":
 		fmt.Println("Running day11")
 		day11.Day11()
+	case "12":
+		fmt.Println("Running day12")
+		day12.Day12()
 	}
-
 
 	elapsed := time.Since(start)
 	fmt.Printf("Time %f seconds\n", elapsed.Seconds())
