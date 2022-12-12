@@ -3,6 +3,8 @@ package day12
 import (
 	"advent-of-code-2022/utils"
 	"fmt"
+	"sort"
+
 	//"math"
 	"os"
 	"os/exec"
@@ -17,6 +19,8 @@ const (
 func Day12() {
 	lines := utils.GetInput("./day12/input.txt")
 	fmt.Println("Task1: ", task1(lines))
+	fmt.Println("Task2: ", task2(lines))
+
 }
 
 func task1(lines []string) int {
@@ -24,7 +28,7 @@ func task1(lines []string) int {
 
 	path := searchGrid(grid, *start, *end)
 
-	fmt.Println("Path", path)
+	//fmt.Println("Path", path)
 	if path == nil {
 		return -1
 	}
@@ -41,8 +45,49 @@ func task1(lines []string) int {
 	return steps
 }
 
-func task2() {
+func task2(lines []string) int {
+	grid, _, end := parseInput(lines)
 
+	var pathLengs []int
+	for y := 0; y < len(grid); y++ {
+		for x := 0; x < len(grid[0]); x++ {
+			if grid[y][x].value != 97 {
+				continue
+			}
+			start := grid[y][x]
+			path := searchGrid(grid, start, *end)
+			if path == nil {
+				continue
+			}
+
+			steps := 0
+
+			next := path.parent
+
+			for next != nil {
+				steps++
+				next = next.parent
+			}
+			pathLengs = append(pathLengs, steps)
+
+		}
+	}
+
+	/*
+	sort.Slice(pathLengs, func(i,j int) bool {
+		return i < j
+	})*/
+
+	sort.Ints (pathLengs)
+/*
+
+	fmt.Println(pathLengs[0])
+	fmt.Println(pathLengs[1])
+	fmt.Println(pathLengs[2])
+
+	fmt.Println(pathLengs)
+*/
+	return pathLengs[0]
 }
 
 func parseInput(lines []string) ([][]Node, *Node, *Node) {
@@ -66,7 +111,7 @@ func parseInput(lines []string) ([][]Node, *Node, *Node) {
 				start = node
 				node.value = int('a')
 			}
-			
+
 			if value == TARGET {
 				//fmt.Println("FOUND END")
 				end = node
@@ -74,7 +119,6 @@ func parseInput(lines []string) ([][]Node, *Node, *Node) {
 			}
 			row = append(row, *node)
 
-			
 			//row = append(row, value)
 		}
 		grid = append(grid, row)
@@ -107,7 +151,7 @@ func searchGrid(grid [][]Node, start Node, end Node) *Node {
 	queue = append(queue, grid[start.y][start.x])
 
 	//in := 0
-	for len(queue) > 0 {	
+	for len(queue) > 0 {
 		//in++
 		current := queue[0]
 		queue = queue[1:]
@@ -115,14 +159,14 @@ func searchGrid(grid [][]Node, start Node, end Node) *Node {
 		//queue = queue[:len(queue)-1]
 		//printGrid2(grid, current, current, visited2, queue, []Node)
 		//fmt.Println(string(current.value), current.getPos())
-		
+
 		visited2 = append(visited2, current)
 
 		//visited2[current] = true
 
 		if current.x == end.x && current.y == end.y {
-			fmt.Println("Found: ", current)
-			
+			//fmt.Println("Found: ", current)
+
 			return &current
 		}
 
@@ -141,7 +185,7 @@ func searchGrid(grid [][]Node, start Node, end Node) *Node {
 				next.parent = &current
 				queue = append(queue, next)
 				continue
-	
+
 			}
 
 			if Contains(visited2, next) {
@@ -150,18 +194,18 @@ func searchGrid(grid [][]Node, start Node, end Node) *Node {
 				//wait()
 				continue
 			}
-		    //diff := math.Max(float64(current.value), float64(next.value)) - math.Min(float64(current.value), float64(next.value))
+			//diff := math.Max(float64(current.value), float64(next.value)) - math.Min(float64(current.value), float64(next.value))
 			//fmt.Println("DIFF", diff)
 			//if diff <= 1 || current.value == START /*current.value+1 <= next.value*/ {
-			if next.value <= current.value + 1 {
+			if next.value <= current.value+1 {
 				if !Contains(queue, next) {
-				//	fmt.Println("Adding to queue:", next, (next.value >= current.value))
+					//	fmt.Println("Adding to queue:", next, (next.value >= current.value))
 					//fmt.Scanln()
 					//wait()
 					next.parent = &current
 					queue = append(queue, next)
 				} else {
-				//	fmt.Println("Allready queued")
+					//	fmt.Println("Allready queued")
 					//fmt.Scanln()
 					wait()
 				}
@@ -246,13 +290,13 @@ func printGrid2(grid [][]Node, focus Node, look Node, visited []Node, queue []No
 	cmd.Stdout = os.Stdout
 	cmd.Run()
 	/*
-	fmt.Println("Focus:", focus, grid[focus.y][focus.x].value, string(rune(grid[focus.y][focus.x].value)))
-	fmt.Println("Looking at:", look, grid[look.y][look.x].value, string(rune(grid[look.y][look.x].value)))
+		fmt.Println("Focus:", focus, grid[focus.y][focus.x].value, string(rune(grid[focus.y][focus.x].value)))
+		fmt.Println("Looking at:", look, grid[look.y][look.x].value, string(rune(grid[look.y][look.x].value)))
 
-	fmt.Println("Visited", visited)
-	fmt.Println("Queue", queue)
-	fmt.Println("Neighbours", neighbours)
-	fmt.Println("")
+		fmt.Println("Visited", visited)
+		fmt.Println("Queue", queue)
+		fmt.Println("Neighbours", neighbours)
+		fmt.Println("")
 	*/
 	row := ""
 	for y := 0; y < len(grid); y++ {
@@ -281,7 +325,7 @@ func printGrid2(grid [][]Node, focus Node, look Node, visited []Node, queue []No
 	fmt.Println("VISITED:", len(visited))
 	//time.Sleep(1 * time.Second)
 	//fmt.Scanln()
-	wait();
+	wait()
 }
 
 func printGrid3(grid [][]Node, focus Node, visited []Node, queue []Node) {
@@ -290,13 +334,13 @@ func printGrid3(grid [][]Node, focus Node, visited []Node, queue []Node) {
 	cmd.Stdout = os.Stdout
 	cmd.Run()
 	/*
-	fmt.Println("Focus:", focus, grid[focus.y][focus.x].value, string(rune(grid[focus.y][focus.x].value)))
-	fmt.Println("Looking at:", look, grid[look.y][look.x].value, string(rune(grid[look.y][look.x].value)))
+		fmt.Println("Focus:", focus, grid[focus.y][focus.x].value, string(rune(grid[focus.y][focus.x].value)))
+		fmt.Println("Looking at:", look, grid[look.y][look.x].value, string(rune(grid[look.y][look.x].value)))
 
-	fmt.Println("Visited", visited)
-	fmt.Println("Queue", queue)
-	fmt.Println("Neighbours", neighbours)
-	fmt.Println("")
+		fmt.Println("Visited", visited)
+		fmt.Println("Queue", queue)
+		fmt.Println("Neighbours", neighbours)
+		fmt.Println("")
 	*/
 	row := ""
 	for y := 0; y < len(grid); y++ {
@@ -305,7 +349,7 @@ func printGrid3(grid [][]Node, focus Node, visited []Node, queue []Node) {
 			if focus.x == x && focus.y == y {
 				//row += fmt.Sprint("\033[35m" + "*" + "\033[0m")
 				val = fmt.Sprint("\033[35m" + string(rune(grid[y][x].value)) + "\033[0m")
-			}  else {
+			} else {
 				val = string(rune(grid[y][x].value))
 				if Contains(visited, grid[y][x]) {
 					val = fmt.Sprint("\033[22m" + "." + "\033[0m")
@@ -324,10 +368,10 @@ func printGrid3(grid [][]Node, focus Node, visited []Node, queue []Node) {
 
 	//time.Sleep(1 * time.Second)
 	//fmt.Scanln()
-	wait();
+	wait()
 }
 
 func wait() {
 	//fmt.Scanln()
-	time.Sleep(1* time.Nanosecond)
+	time.Sleep(1 * time.Nanosecond)
 }
