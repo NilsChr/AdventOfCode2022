@@ -8,10 +8,11 @@ import (
 
 func Test1(t *testing.T) {
 	lines := utils.GetInput("./input-test.txt")
-	grid, start := parseInput(lines)
+	grid, start, end := parseInput(lines)
+	fmt.Println(end)
 	printGrid(grid)
-	start.x = 4
-	start.y = 0
+	start.x = 2
+	start.y = 4
 	neighbours := getNeighbours(grid, *start)
 	fmt.Println(start)
 	fmt.Println(neighbours)

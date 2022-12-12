@@ -14,8 +14,10 @@ func GetInput(path string) []string {
 	var lines []string = strings.Split(string(content), "\n")
 
 	// Remove \n on windows
+	/*
 	for i, line := range lines {
 		lines[i] = line[:len(line)-1]
 	}
+	*/
 	return lines
 }
