@@ -67,7 +67,7 @@ func main() {
 		day12.Day12()
 	case "13":
 		fmt.Println("Running day13")
-		day13.Day13()
+		day13.Day13_2()
 	case "14":
 		fmt.Println("Running day14")
 		day14.Day14()
