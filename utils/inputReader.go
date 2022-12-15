@@ -2,6 +2,7 @@ package utils
 
 import (
 	"os"
+	"runtime"
 	"strings"
 )
 
@@ -11,13 +12,14 @@ func GetInput(path string) []string {
 		panic(err)
 	}
 	content := string(dat)
-	var lines []string = strings.Split(string(content), "\n")
+	osName := runtime.GOOS
 
-	// Remove \n on windows
-	/*
-	for i, line := range lines {
-		lines[i] = line[:len(line)-1]
+	endOfLine := "\n"
+	if osName == "windows" {
+		endOfLine = "\r\n"
 	}
-	*/
+
+	var lines []string = strings.Split(string(content), endOfLine)
+
 	return lines
 }
