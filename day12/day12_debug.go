@@ -20,6 +20,7 @@ func printGrid(grid [][]Node) {
 		fmt.Println(row)
 		row = ""
 	}
+
 }
 
 func printGrid2(grid [][]Node, focus Node, look Node, visited []Node, queue []Node, neighbours []Vec2) {
