@@ -3,14 +3,19 @@ package day22
 import (
 	"advent-of-code-2022/utils"
 	"fmt"
+	"time"
+
+	//"math"
 	"regexp"
 	"strconv"
 	//"time"
 )
 
 func Day22() {
-	lines := utils.GetInput("./day22/input.txt")
-	fmt.Println("Task1: ", task1(lines))
+	lines := utils.GetInput("./day22/input-test4.txt")
+//	fmt.Println("Task1: ", task1(lines))
+	fmt.Println("Task2: ", task2(lines))
+
 }
 
 func task1(lines []string) int {
@@ -136,6 +141,93 @@ func task1(lines []string) int {
 	return sum
 }
 
+func task2(lines []string) int {
+	grid, instructions := parseInput(lines)
+	startPos := getStartPos(grid)
+	dir := utils.Vec2{X:1, Y:0}
+	cubeSize := 2
+	fmt.Print(instructions)
+	path := make(map[utils.Vec2]string)
+
+	for len(instructions) > 0 {
+		ins, rot, steps := getNextInstruction(instructions)
+		instructions = ins
+
+		if rot != "NA" {
+			rotateDir(&dir, rot)
+			continue
+		}
+
+		
+		for steps > 0 {
+
+			utils.ClearConsole()
+			fmt.Println(dir)
+			printMap(grid, startPos,path)
+			time.Sleep(1*time.Second)
+
+			path[*startPos.Copy()] = "+"
+			steps--
+			nextPos := startPos.Copy().Add(dir)
+			outofBounds := nextPos.X < 0 ||nextPos.Y < 0 || nextPos.X > len(grid[0])-1 || nextPos.Y > len(grid)-1 
+
+			if grid[nextPos.Y][nextPos.X] == " " {
+				outofBounds = true
+			}
+
+			if outofBounds || grid[nextPos.Y][nextPos.X] == " "{
+				
+				shouldBreak := false // If hits a wall during wrap
+
+				x, y := moveCoordinateOnCubeTexture(startPos.X, startPos.Y,cubeSize, nextPos.X, nextPos.Y)
+				fmt.Println(x,y)
+
+
+				/*
+				currentSide := getCurrentSide(cubeSize, &startPos)
+				//nextSide := getCurrentSide(cubeSize, &nextPos)
+
+				if currentSide == 1 && nextPos.X < startPos.X {
+					// Wrap to side '4
+					ny := cubeSize * 2 + (cubeSize - (startPos.Y % cubeSize))
+					wrapPos := utils.NewVec2(0,ny)
+					// 2 * 2 + (2 - 0 % 2)
+					if grid[wrapPos.Y][wrapPos.X] == "#" {
+						shouldBreak = true
+					} else if grid[wrapPos.Y][wrapPos.X] == "." {
+						nextPos = *wrapPos.Copy()
+					}
+				}
+				*/
+
+				if shouldBreak {
+					//fmt.Println("breaking")
+					break
+				}
+			}
+
+
+			//fmt.Println("Checking", nextPos)
+
+			if grid[nextPos.Y][nextPos.X] == "." {
+				startPos = *nextPos.Copy()
+				continue
+			}
+			if grid[nextPos.Y][nextPos.X] == "#" {
+				break
+			}
+		}
+
+	}
+	//printMap(grid, startPos,path)
+	fmt.Println(startPos)
+	fmt.Println(dir)
+	startPos.AddTo(*utils.NewVec2(1,1))
+	sum := (startPos.Y * 1000) + (startPos.X * 4) + getFacingValue(dir)
+
+	return sum
+}
+
 func parseInput(lines []string) ([][]string, string){
 	instructions := lines[len(lines)-1]
 	lines = lines[:len(lines)-2]
@@ -230,4 +322,106 @@ func getFacingValue(dir utils.Vec2) int {
 		return 3
 	}
 	return 0
+}
+
+func getCurrentSide(size int, pos *utils.Vec2) int {
+	//int gridCubeWidth = 16, gridCubeHeight = 16;
+
+	//cube.Position.X = Math.round(cube.Position.X / gridCubeWidth) * gridCubeWidth;
+	//cube.Position.Y = Math.round(cube.Position.Y / gridCubeHeight) * gridCubeHeight;
+	x := (pos.X / size * size) / size //math.Floor(float64(pos.X / size)) * float64(size)
+	y := (pos.Y / size * size) / size //math.Floor(1.1) * float64(size)
+	if x == 1 && y == 0 {
+		return 1
+	}
+	if x == 2 && y == 0 {
+		return 2
+	}
+	if x == 1 && y == 1 {
+		return 3
+	}
+	if x == 0 && y == 2 {
+		return 4
+	}
+	if x == 1 && y == 2 {
+		return 5
+	}
+	if x == 0 && y == 3 {
+		return 6
+	}
+
+	return -1
+}
+
+
+// Here comes ChatGPT
+func mapCoordinateToTexture(x, y, z int) (int, int) {
+	// Determine which face of the cube the coordinate is on
+	if x == 50 {
+		// Coordinate is on the right face of the cube
+		u := 50 - z
+		v := y
+		return u, v
+	} else if x == 0 {
+		// Coordinate is on the left face of the cube
+		u := z
+		v := y
+		return u, v
+	} else if y == 50 {
+		// Coordinate is on the top face of the cube
+		u := x
+		v := z
+		return u, v
+	} else if y == 0 {
+		// Coordinate is on the bottom face of the cube
+		u := x
+		v := 50 - z
+		return u, v
+	} else if z == 50 {
+		// Coordinate is on the front face of the cube
+		u := x
+		v := y
+		return u, v
+	} else if z == 0 {
+		// Coordinate is on the back face of the cube
+		u := 50 - x
+		v := y
+		return u, v
+	} else {
+		// Coordinate is inside the cube, not on any face
+		return 0, 0
+	}
+}
+
+func moveCoordinateOnCubeTexture(x, y, size, dx, dy int) (int, int) {
+	// Convert the 2D coordinate to a 3D coordinate
+	z := 0
+	if x > size/2 {
+		x = size - x
+		z = size
+	}
+	if y > size/2 {
+		y = size - y
+		z = size
+	}
+	// Map the 3D coordinate to a position on the texture
+	u, v := mapCoordinateToTexture(x, y, z)
+	// Add the displacement to the texture coordinates
+	u += dx
+	v += dy
+	// Wrap the texture coordinates around if they go out of bounds
+	u = u % size
+	v = v % size
+	// Convert the texture coordinates back to a 2D coordinate
+	if z == size {
+		x = size - u
+	} else {
+		x = u
+	}
+	if z == size {
+		y = size - v
+	} else {
+		y = v
+	}
+	return x, y
 }
