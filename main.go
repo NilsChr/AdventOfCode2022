@@ -10,7 +10,11 @@ import (
 	"advent-of-code-2022/day15"
 	"advent-of-code-2022/day16"
 	"advent-of-code-2022/day17"
+	"advent-of-code-2022/day18"
+	"advent-of-code-2022/day19"
 	"advent-of-code-2022/day2"
+	"advent-of-code-2022/day20"
+	"advent-of-code-2022/day21"
 	"advent-of-code-2022/day3"
 	"advent-of-code-2022/day4"
 	"advent-of-code-2022/day5"
@@ -83,6 +87,18 @@ func main() {
 	case "17":
 		fmt.Println("Running day17")
 		day17.Day17()
+	case "18":
+		fmt.Println("Running day18")
+		day18.Day18()
+	case "19":
+		fmt.Println("Running day19")
+		day19.Day19()
+	case "20":
+		fmt.Println("Running day20")
+		day20.Day20()
+	case "21":
+		fmt.Println("Running day21")
+		day21.Day21()
 	}
 
 	elapsed := time.Since(start)
