@@ -17,6 +17,8 @@ import (
 	"advent-of-code-2022/day21"
 	"advent-of-code-2022/day22"
 	"advent-of-code-2022/day23"
+	"advent-of-code-2022/day24"
+	"advent-of-code-2022/day25"
 	"advent-of-code-2022/day3"
 	"advent-of-code-2022/day4"
 	"advent-of-code-2022/day5"
@@ -107,6 +109,12 @@ func main() {
 	case "23":
 		fmt.Println("Running day23")
 		day23.Day23()
+	case "24":
+		fmt.Println("Running day24")
+		day24.Day24()
+	case "25":
+		fmt.Println("Running day25")
+		day25.Day25()
 	}
 
 	elapsed := time.Since(start)
